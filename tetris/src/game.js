@@ -23,7 +23,6 @@ let scoreValue = 0;
 let level = 1;
 let completedRows = 0;
 let gameSpeed = initialGameSpeed;
-let gameInterval;
 let isGameOver = false;
 
 // TODO Create Unit Tests
@@ -96,6 +95,14 @@ function setGameSpeed(newGameSpeed) {
   gameSpeed = newGameSpeed;
 }
 
+function getIsGameOver() {
+  return isGameOver;
+}
+
+function setIsGameOver(state) {
+  isGameOver = state;
+}
+
 function updateCompletedRows(fullLines) {
   if (fullLines >= 0) {
     setCompletedRows(getCompletedRows() + fullLines);
@@ -128,12 +135,9 @@ function updateScore() {
   setGameSpeed(Math.max(100, initialGameSpeed - getLevel() * 20));
 }
 
-// TODO Continue test coverage
-
 function gameOver() {
   // Stops the game
-  isGameOver = true;
-  clearInterval(gameInterval);
+  setIsGameOver(true);
   // Stop the background music (e.g., when the game ends)
   if (backgroundMusic) {
     backgroundMusic.pause();
@@ -152,6 +156,8 @@ function gameOver() {
     startButton.removeAttribute("disabled");
   }
 }
+
+// TODO Continue test coverage
 
 function updateHighscore() {
   const finalScore = getScoreValue();
@@ -202,7 +208,7 @@ function startGame() {
     backgroundMusic.play();
   }
   // Initialize game variables and start the game loop
-  isGameOver = false;
+  setIsGameOver(false);
   setScoreValue(0);
   if (scoreEl) {
     scoreEl.textContent = 0;
@@ -233,7 +239,6 @@ if (retryButton) {
 getHighscore();
 
 export {
-  isGameOver,
   updateCompletedRows,
   getCompletedRows,
   setCompletedRows,
@@ -246,4 +251,6 @@ export {
   updateScore,
   setGameSpeed,
   getGameSpeed,
+  gameOver,
+  getIsGameOver,
 };

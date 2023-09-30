@@ -1,7 +1,9 @@
 /**
  * @vitest-environment happy-dom
  */
-import { vi, expect, test } from "vitest";
+import { beforeEach, expect, test, vi } from "vitest";
+// TODO check this reference to test the DOM: https://github.com/capricorn86/happy-dom/wiki/Getting-started#installation
+// import { Window } from "happy-dom";
 import {
   updateCompletedRows,
   getCompletedRows,
@@ -15,8 +17,9 @@ import {
   setCompletedRows,
   setGameSpeed,
   getGameSpeed,
+  gameOver,
+  getIsGameOver,
 } from "../tetris/src/game";
-import { beforeEach } from "vitest";
 
 beforeEach(async () => {
   await setLevel(1);
@@ -143,19 +146,6 @@ test("No level update for less than 10 full lines", () => {
   expect(getCompletedRows()).toBe(7);
 });
 
-// Mocking DOM elements
-const scoreEl = {
-  textContent: null,
-};
-
-// Mocking initial game speed
-const initialGameSpeed = 500;
-
-// Mocking level element (if needed)
-const levelEl = {
-  textContent: null,
-};
-
 // Test case: Testing score update with level increase
 test("Update score, level, and game speed when completing 10 full lines", () => {
   // Set initial level, completed rows, and game speed
@@ -188,4 +178,14 @@ test("Update score and game speed without level increase", () => {
 
   // Assert that the game speed is updated based on the new level
   expect(getGameSpeed()).toBe(420); // Calculated based on initialGameSpeed - level * 20
+});
+
+// Test case: Test if the game is correctly marked as over (isGameOver is set to true):
+test("Game Over: Check if isGameOver is set to true", () => {
+  // Set up initial game state (e.g., isGameOver is initially false)
+  // Call the gameOver function
+  gameOver();
+
+  // Assert that isGameOver is now true
+  expect(getIsGameOver()).toBe(true); // Replace getIsGameOver with your actual getter function
 });

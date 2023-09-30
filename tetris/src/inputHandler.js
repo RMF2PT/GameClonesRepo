@@ -7,7 +7,7 @@ import {
   drawPiece,
   placePieceInGrid,
 } from "./renderer.js";
-import { isGameOver } from "./game.js";
+import { getIsGameOver } from "./game.js";
 
 function checkColision(pieceShape) {
   // If the piece shape is not provided, use the current piece
@@ -124,7 +124,7 @@ function rotatePieceClockwise() {
 
 // Event handlers
 document.addEventListener("keydown", (event) => {
-  if (!isGameOver) {
+  if (!getIsGameOver()) {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
       moveLeft(piece);
