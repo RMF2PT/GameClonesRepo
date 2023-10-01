@@ -157,8 +157,6 @@ function gameOver() {
   }
 }
 
-// TODO Continue test coverage
-
 function updateHighscore() {
   const finalScore = getScoreValue();
   if (localStorage.getItem("tetris-highscore")) {
@@ -173,14 +171,14 @@ function updateHighscore() {
     localStorage.setItem("tetris-highscore", finalScore);
   }
 }
+// TODO Continue test coverage
 
-function getHighscore() {
+function getHighscore(element) {
   // Check for highscore on local storage and renders it
   if (localStorage.getItem("tetris-highscore")) {
     const previousHighscore = localStorage.getItem("tetris-highscore");
-    if (highscoreEl) {
-      highscoreEl.textContent = previousHighscore;
-    }
+
+    element.textContent = previousHighscore;
   }
 }
 
@@ -213,7 +211,7 @@ function startGame() {
   if (scoreEl) {
     scoreEl.textContent = 0;
   }
-  getHighscore();
+  getHighscore(highscoreEl);
   setLevel(1);
   setGameSpeed(initialGameSpeed);
   resetGrid();
@@ -236,7 +234,7 @@ if (retryButton) {
 }
 
 // On load
-getHighscore();
+getHighscore(highscoreEl);
 
 export {
   updateCompletedRows,
@@ -249,6 +247,8 @@ export {
   getScoreValue,
   setScoreValue,
   updateScore,
+  updateHighscore,
+  getHighscore,
   setGameSpeed,
   getGameSpeed,
   gameOver,
