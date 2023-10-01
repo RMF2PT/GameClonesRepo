@@ -5,7 +5,7 @@
 // TODO put a sound when pieces land
 // TODO show a pop-up with the score of the current full lines
 
-import { moveDown, checkColision } from "./inputHandler.js";
+import { moveDown, checkCollision } from "./inputHandler.js";
 import {
   clearPiece,
   clearAllPieces,
@@ -179,20 +179,29 @@ function getHighscore(element) {
   }
 }
 
-// TODO Continue test coverage
-function updateGame() {
+function updateGame(
+  moveDownFunction,
+  checkCollisionFunction,
+  getPieceFunction,
+  clearPieceFunction,
+  gameOverFunction
+) {
   // Implements the main game loop
-  moveDown(getPiece());
+  moveDownFunction(getPieceFunction());
   // If the piece coliddes at the first move down, it's game over
-  if (checkColision(getPiece().shape)) {
-    clearPiece();
-    gameOver();
+  if (checkCollisionFunction(getPieceFunction().shape)) {
+    clearPieceFunction();
+    gameOverFunction();
     return;
   }
   // Schedule the next execution of updateGame with the updated gameSpeed
-  setTimeout(updateGame, gameSpeed);
+  setTimeout(
+    () => updateGame(moveDown, checkCollision, getPiece, clearPiece, gameOver),
+    getGameSpeed()
+  );
 }
 
+// TODO Continue test coverage
 function startGame() {
   // Hide the message container
   if (messageContainer && !messageContainer.classList.contains("hidden")) {
@@ -216,7 +225,7 @@ function startGame() {
   clearAllPieces();
   createNextPiece();
   createFirstPiece();
-  updateGame();
+  updateGame(moveDown, checkCollision, getPiece, clearPiece, gameOver);
   // Disable the start button so that the user doesn't click ingame
   if (startButton) {
     startButton.setAttribute("disabled", "true");

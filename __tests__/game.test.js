@@ -1,4 +1,3 @@
-import { describe } from "vitest";
 import {
   updateCompletedRows,
   getCompletedRows,
@@ -336,30 +335,72 @@ describe("Get Highscore", () => {
   });
 });
 
-// TODO
-test("Piece moves down successfully without collision", () => {
-  // Mock functions and variables
-  const mockMoveDown = vi.fn();
-  const mockCheckCollision = vi.fn(() => false);
-  const mockClearPiece = vi.fn();
-  const mockGameOver = vi.fn();
-  const mockSetTimeout = vi.spyOn(global, "setTimeout");
+describe("Update Game", () => {
+  test("Piece moves down successfully without collision", () => {
+    // Mock functions and variables
+    const mockMoveDown = vi.fn();
+    const mockCheckCollision = vi.fn(() => false);
+    const mockClearPiece = vi.fn();
+    const mockGameOver = vi.fn();
+    const mockSetTimeout = vi.spyOn(global, "setTimeout");
+    const mockGetPiece = vi.fn(() => "");
 
-  // Replace actual functions with mocks
-  global.moveDown = mockMoveDown;
-  global.checkCollision = mockCheckCollision;
-  global.clearPiece = mockClearPiece;
-  global.gameOver = mockGameOver;
+    // Replace actual functions with mocks
+    global.moveDown = mockMoveDown;
+    global.checkCollision = mockCheckCollision;
+    global.clearPiece = mockClearPiece;
+    global.gameOver = mockGameOver;
+    global.getPiece = mockGetPiece;
 
-  // Call the updateGame function
-  updateGame();
+    // Call the updateGame function
+    updateGame(mockMoveDown, mockCheckCollision, mockGetPiece);
 
-  // Assert that the moveDown function was called
-  expect(mockMoveDown).toHaveBeenCalled();
-  // Assert that the setTimeout function was called with the correct arguments
-  expect(mockSetTimeout).toHaveBeenCalledWith(expect.any(Function), gameSpeed);
-  // Ensure that other functions are not called
-  expect(mockCheckCollision).not.toHaveBeenCalled();
-  expect(mockClearPiece).not.toHaveBeenCalled();
-  expect(mockGameOver).not.toHaveBeenCalled();
+    // Assert that the moveDown function was called
+    expect(mockMoveDown).toHaveBeenCalled();
+    // Assert that the setTimeout function was called with the correct arguments
+    expect(mockSetTimeout).toHaveBeenCalledWith(
+      expect.any(Function),
+      getGameSpeed()
+    );
+    // Ensure that other functions are not called
+    // expect(mockCheckCollision).not.toHaveBeenCalled();
+    expect(mockClearPiece).not.toHaveBeenCalled();
+    expect(mockGameOver).not.toHaveBeenCalled();
+  });
+
+  test("Clear piece and Game Over is called when there's a collision", () => {
+    // Mock functions and variables
+    const mockMoveDown = vi.fn();
+    const mockCheckCollision = vi.fn(() => true); // Simulate a collision
+    const mockClearPiece = vi.fn();
+    const mockGameOver = vi.fn();
+    const mockSetTimeout = vi.spyOn(global, "setTimeout");
+    const mockGetPiece = vi.fn(() => "");
+
+    // Replace actual functions with mocks
+    global.moveDown = mockMoveDown;
+    global.checkCollision = mockCheckCollision;
+    global.clearPiece = mockClearPiece;
+    global.gameOver = mockGameOver;
+    global.getPiece = mockGetPiece;
+
+    // Call the updateGame function
+    updateGame(
+      mockMoveDown,
+      mockCheckCollision,
+      mockGetPiece,
+      mockClearPiece,
+      mockGameOver
+    );
+
+    // Assert that the moveDown function was called
+    expect(mockMoveDown).toHaveBeenCalled();
+    // Assert that the setTimeout function was not called
+    expect(mockSetTimeout).not.toHaveBeenCalled();
+    // Ensure that other functions are called
+    expect(mockClearPiece).toHaveBeenCalled();
+    expect(mockGameOver).toHaveBeenCalled();
+  });
 });
+
+// TODO

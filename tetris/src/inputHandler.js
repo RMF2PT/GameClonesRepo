@@ -8,7 +8,7 @@ import {
 import { getIsGameOver } from "./game.js";
 import { getGrid, getPiece } from "./gameElements.js";
 
-function checkColision(pieceShape) {
+function checkCollision(pieceShape) {
   const piece = getPiece();
   const grid = getGrid();
   // If the piece shape is not provided, use the current piece
@@ -39,7 +39,7 @@ function moveDown(piece) {
     block.row++;
   }
   // Check if the new position is valid (not colliding with other blocks or going out of bounds
-  if (!checkColision(newPiece.shape)) {
+  if (!checkCollision(newPiece.shape)) {
     // If new position is valid, update the piece to its new position
     // piece = newPiece;
     reassignPiece(newPiece);
@@ -62,7 +62,7 @@ function moveLeft(piece) {
     block.col--; // Move left by decrementing the column coordinate
   }
   // Check if the new position is valid (not colliding with other blocks or going out of bounds)
-  if (!checkColision(newPiece.shape)) {
+  if (!checkCollision(newPiece.shape)) {
     // If the new position is valid, update the piece to its new position
     // piece = newPiece;
     reassignPiece(newPiece);
@@ -81,7 +81,7 @@ function moveRight(piece) {
     block.col++; // Move left by decrementing the column coordinate
   }
   // Check if the new position is valid (not colliding with other blocks or going out of bounds)
-  if (!checkColision(newPiece.shape)) {
+  if (!checkCollision(newPiece.shape)) {
     // If the new position is valid, update the piece to its new position
     // piece = newPiece;
     reassignPiece(newPiece);
@@ -112,7 +112,7 @@ function rotatePieceClockwise(piece) {
     block.col = center.col + rowOffset;
   }
   // Check if the new position is valid (not colliding with other blocks or going out of bounds)
-  if (!checkColision(newPiece.shape)) {
+  if (!checkCollision(newPiece.shape)) {
     // If the new position is valid, update the piece to its rotated shape
     // piece = newPiece;
     reassignPiece(newPiece);
@@ -143,4 +143,4 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-export { moveDown, moveLeft, moveRight, rotatePieceClockwise, checkColision };
+export { moveDown, moveLeft, moveRight, rotatePieceClockwise, checkCollision };
