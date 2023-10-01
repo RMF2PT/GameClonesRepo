@@ -1,21 +1,23 @@
 import { piecesCollection, ROWS, COLUMNS } from "./piecesCollection.js";
 import { updateCompletedRows, calculateScore, updateScore } from "./game.js";
+import {
+  setPiece,
+  getPiece,
+  setGrid,
+  getGrid,
+  setNextPiece,
+  getNextPiece,
+} from "./gameElements.js";
 
 const gameContainer = document.getElementById("game-container");
 const nextPieceContainer = document.getElementById("next-piece-container");
 const BLOCK_SIZE = 30;
 
-let grid = [];
-let piece;
-let nextPiece;
-
-function resetGrid() {
-  grid = Array.from({ length: ROWS }, () => Array(COLUMNS).fill(null));
-}
+// TODO create setter and getter for piece, grid and nextpiece - it might be better to move game elements to new file
 
 function createFirstPiece() {
-  piece = createPiece();
-  drawPiece(piece);
+  setPiece(createPiece());
+  drawPiece(getPiece());
 }
 
 function createPiece() {
@@ -27,19 +29,19 @@ function createPiece() {
 
 function createNextPiece() {
   // Assign the next piece to the current piece
-  if (nextPiece !== null) {
-    piece = nextPiece;
+  if (getNextPiece() !== null) {
+    setPiece(getNextPiece());
   }
   // Clear any existing display of the next piece
   clearNextPieceDisplay();
   // Create the next piece
-  nextPiece = createPiece();
+  setNextPiece(createPiece());
   // Draw the next piece on the UI
-  drawNextPiece(nextPiece);
+  drawNextPiece(getNextPiece());
 }
 
 function reassignPiece(newPiece) {
-  piece = newPiece;
+  setPiece(newPiece);
 }
 
 function clearPiece() {
@@ -80,6 +82,7 @@ function clearAllPieces() {
 }
 
 function drawPiece() {
+  const piece = getPiece();
   // Get the current piece shape
   const pieceShape = piece.shape;
   // Loop through each block in the piece shape
@@ -103,6 +106,7 @@ function drawPiece() {
 }
 
 function drawNextPiece() {
+  const nextPiece = getNextPiece();
   // Get the next piece shape
   const pieceShape = nextPiece.shape;
   // Loop through each block in the piece shape
@@ -128,6 +132,7 @@ function drawNextPiece() {
 }
 
 function drawLandedBlocks() {
+  const grid = getGrid();
   // Loop through the grid and draw the landed blocks
   for (let row = 0; row < ROWS; row++) {
     for (let col = 0; col < COLUMNS; col++) {
@@ -143,11 +148,14 @@ function drawLandedBlocks() {
 }
 
 function placePieceInGrid() {
+  const piece = getPiece();
+  const grid = getGrid();
   // Add the current piece to the grid
   for (const block of piece.shape) {
     const { row, col } = block;
     grid[row][col] = 1; // You can use 1 to represent the presence of a block in the grid
   }
+  setGrid(grid);
   // After placing the piece in the grid, check and clear completed lines
   clearFullLines();
   // Update the score
@@ -159,6 +167,7 @@ function placePieceInGrid() {
 }
 
 function clearFullLines() {
+  const grid = getGrid();
   // Initialize an array to store the row indices of full lines
   const fullLines = [];
   // Check each row in the grid
@@ -188,7 +197,6 @@ function clearFullLines() {
       }
     });
   }
-
   for (const fullRow of fullLines) {
     const blocksInFullLine = gameContainer.querySelectorAll(".block");
     blocksInFullLine.forEach((block) => {
@@ -204,13 +212,11 @@ function clearFullLines() {
     grid.splice(fullRow, 1); // Remove the full row
     grid.unshift(Array(COLUMNS).fill(null)); // Add an empty row at the top
   }
+  setGrid(grid);
   calculateScore(fullLines);
 }
 
 export {
-  grid,
-  piece,
-  resetGrid,
   createFirstPiece,
   createNextPiece,
   reassignPiece,

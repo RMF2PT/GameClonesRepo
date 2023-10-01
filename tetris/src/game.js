@@ -1,12 +1,18 @@
+// TODO Create Unit Tests
+// TODO increase game music with speed
+// TODO make the start button a pause button during in-game
+// TODO make a button to quit game in Game Over screen
+// TODO put a sound when pieces land
+// TODO show a pop-up with the score of the current full lines
+
 import { moveDown, checkColision } from "./inputHandler.js";
 import {
-  piece,
-  resetGrid,
   clearPiece,
   clearAllPieces,
   createFirstPiece,
   createNextPiece,
 } from "./renderer.js";
+import { getPiece, resetGrid } from "./gameElements.js";
 
 const scoreEl = document.getElementById("score");
 const highscoreEl = document.getElementById("high-score");
@@ -16,7 +22,6 @@ const messageContainer = document.getElementById("message-container");
 const retryButton = document.getElementById("retry-button");
 const backgroundMusic = document.getElementById("background-music");
 const gameOverMusic = document.getElementById("game-over-music");
-
 const initialGameSpeed = 500;
 
 let scoreValue = 0;
@@ -24,44 +29,6 @@ let level = 1;
 let completedRows = 0;
 let gameSpeed = initialGameSpeed;
 let isGameOver = false;
-
-// TODO Create Unit Tests
-// TODO increase game music with speed
-// TODO make the start button a pause button during in-game
-// TODO make a button to quit game in Game Over screen
-// TODO put a sound when pieces land
-// TODO show a pop-up with the score of the current full lines
-
-function calculateScore(fullLines) {
-  /* 
-  Score Grid:
-  Single Line Clear: 100 points
-  Double Line Clear: 300 points
-  Triple Line Clear: 500 points
-  Tetris Line Clear: 800 points
-  Level Bonus: 100 points per level
-  TODO: implement Soft and Hard Drop
-  Soft Drop Score: 1 point per cell moved downward
-  Hard Drop Score: 2 points per cell dropped
-  */
-  const currentLevel = getLevel();
-  switch (fullLines.length) {
-    case 1:
-      setScoreValue(getScoreValue() + 100 + 100 * currentLevel);
-      break;
-    case 2:
-      setScoreValue(getScoreValue() + 300 + 100 * currentLevel);
-      break;
-    case 3:
-      setScoreValue(getScoreValue() + 500 + 100 * currentLevel);
-      break;
-    case 4:
-      setScoreValue(getScoreValue() + 800 + 100 * currentLevel);
-      break;
-    default:
-      break;
-  }
-}
 
 function getScoreValue() {
   return scoreValue;
@@ -101,6 +68,37 @@ function getIsGameOver() {
 
 function setIsGameOver(state) {
   isGameOver = state;
+}
+
+function calculateScore(fullLines) {
+  /* 
+  Score Grid:
+  Single Line Clear: 100 points
+  Double Line Clear: 300 points
+  Triple Line Clear: 500 points
+  Tetris Line Clear: 800 points
+  Level Bonus: 100 points per level
+  TODO: implement Soft and Hard Drop
+  Soft Drop Score: 1 point per cell moved downward
+  Hard Drop Score: 2 points per cell dropped
+  */
+  const currentLevel = getLevel();
+  switch (fullLines.length) {
+    case 1:
+      setScoreValue(getScoreValue() + 100 + 100 * currentLevel);
+      break;
+    case 2:
+      setScoreValue(getScoreValue() + 300 + 100 * currentLevel);
+      break;
+    case 3:
+      setScoreValue(getScoreValue() + 500 + 100 * currentLevel);
+      break;
+    case 4:
+      setScoreValue(getScoreValue() + 800 + 100 * currentLevel);
+      break;
+    default:
+      break;
+  }
 }
 
 function updateCompletedRows(fullLines) {
@@ -171,7 +169,6 @@ function updateHighscore() {
     localStorage.setItem("tetris-highscore", finalScore);
   }
 }
-// TODO Continue test coverage
 
 function getHighscore(element) {
   // Check for highscore on local storage and renders it
@@ -182,11 +179,12 @@ function getHighscore(element) {
   }
 }
 
+// TODO Continue test coverage
 function updateGame() {
   // Implements the main game loop
-  moveDown(piece);
+  moveDown(getPiece());
   // If the piece coliddes at the first move down, it's game over
-  if (checkColision(piece.shape)) {
+  if (checkColision(getPiece().shape)) {
     clearPiece();
     gameOver();
     return;
@@ -253,4 +251,5 @@ export {
   getGameSpeed,
   gameOver,
   getIsGameOver,
+  updateGame,
 };

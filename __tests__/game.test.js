@@ -16,6 +16,7 @@ import {
   getIsGameOver,
   updateHighscore,
   getHighscore,
+  updateGame,
 } from "../tetris/src/game";
 
 beforeEach(async () => {
@@ -336,3 +337,29 @@ describe("Get Highscore", () => {
 });
 
 // TODO
+test("Piece moves down successfully without collision", () => {
+  // Mock functions and variables
+  const mockMoveDown = vi.fn();
+  const mockCheckCollision = vi.fn(() => false);
+  const mockClearPiece = vi.fn();
+  const mockGameOver = vi.fn();
+  const mockSetTimeout = vi.spyOn(global, "setTimeout");
+
+  // Replace actual functions with mocks
+  global.moveDown = mockMoveDown;
+  global.checkCollision = mockCheckCollision;
+  global.clearPiece = mockClearPiece;
+  global.gameOver = mockGameOver;
+
+  // Call the updateGame function
+  updateGame();
+
+  // Assert that the moveDown function was called
+  expect(mockMoveDown).toHaveBeenCalled();
+  // Assert that the setTimeout function was called with the correct arguments
+  expect(mockSetTimeout).toHaveBeenCalledWith(expect.any(Function), gameSpeed);
+  // Ensure that other functions are not called
+  expect(mockCheckCollision).not.toHaveBeenCalled();
+  expect(mockClearPiece).not.toHaveBeenCalled();
+  expect(mockGameOver).not.toHaveBeenCalled();
+});

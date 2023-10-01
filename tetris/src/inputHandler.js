@@ -1,15 +1,16 @@
 import { ROWS, COLUMNS } from "./piecesCollection.js";
 import {
-  grid,
-  piece,
   reassignPiece,
   clearPiece,
   drawPiece,
   placePieceInGrid,
 } from "./renderer.js";
 import { getIsGameOver } from "./game.js";
+import { getGrid, getPiece } from "./gameElements.js";
 
 function checkColision(pieceShape) {
+  const piece = getPiece();
+  const grid = getGrid();
   // If the piece shape is not provided, use the current piece
   if (!pieceShape) {
     pieceShape = piece.shape;
@@ -29,7 +30,7 @@ function checkColision(pieceShape) {
   return false;
 }
 
-function moveDown() {
+function moveDown(piece) {
   // Create a copy of the current piece shape
   const newPiece = JSON.parse(JSON.stringify(piece));
 
@@ -53,7 +54,7 @@ function moveDown() {
   drawPiece(piece);
 }
 
-function moveLeft() {
+function moveLeft(piece) {
   // Create a copy of the current piece shape
   const newPiece = JSON.parse(JSON.stringify(piece));
   // Attempt to move each block of the piece one column to the left
@@ -72,7 +73,7 @@ function moveLeft() {
   drawPiece(piece);
 }
 
-function moveRight() {
+function moveRight(piece) {
   // Create a copy of the current piece shape
   const newPiece = JSON.parse(JSON.stringify(piece));
   // Attempt to move each block of the piece one column to the left
@@ -91,7 +92,7 @@ function moveRight() {
   drawPiece(piece);
 }
 
-function rotatePieceClockwise() {
+function rotatePieceClockwise(piece) {
   /// Create a copy of the current piece shape
   const newPiece = JSON.parse(JSON.stringify(piece));
   // Calculate the center of rotation (average of all block coordinates)
@@ -127,17 +128,17 @@ document.addEventListener("keydown", (event) => {
   if (!getIsGameOver()) {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
-      moveLeft(piece);
+      moveLeft(getPiece());
     } else if (event.key === "ArrowRight") {
       event.preventDefault();
-      moveRight(piece);
+      moveRight(getPiece());
     } else if (event.key === " ") {
       event.preventDefault();
       // Rotate the piece when the space key is pressed
-      rotatePieceClockwise(piece);
+      rotatePieceClockwise(getPiece());
     } else if (event.key === "ArrowDown") {
       event.preventDefault();
-      moveDown(piece);
+      moveDown(getPiece());
     }
   }
 });
