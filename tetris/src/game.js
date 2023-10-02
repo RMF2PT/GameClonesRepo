@@ -7,6 +7,8 @@
 
 import { moveDown, checkCollision } from "./inputHandler.js";
 import {
+  updateElementTextContent,
+  updateHighscoreEl,
   clearPiece,
   clearAllPieces,
   createFirstPiece,
@@ -14,9 +16,6 @@ import {
 } from "./renderer.js";
 import { getPiece, resetGrid } from "./gameElements.js";
 
-const scoreEl = document.getElementById("score");
-const highscoreEl = document.getElementById("high-score");
-const levelEl = document.getElementById("level");
 const startButton = document.getElementById("start-button");
 const messageContainer = document.getElementById("message-container");
 const retryButton = document.getElementById("retry-button");
@@ -38,20 +37,12 @@ function setScoreValue(newScore) {
   scoreValue = newScore;
 }
 
-function updateScoreEl(scoreEl, newScore) {
-  scoreEl.textContent = newScore;
-}
-
 function getLevel() {
   return level;
 }
 
 function setLevel(newLevel) {
   level = newLevel;
-}
-
-function updateLevelEl(levelEl) {
-  levelEl.textContent = getLevel();
 }
 
 function getCompletedRows() {
@@ -121,20 +112,15 @@ function updateLevel(fullLinesCount) {
   // Level increases by 1 when 10 full lines are completed
   if (fullLinesCount >= 10) {
     setLevel(getLevel() + 1);
-    if (levelEl) {
-      levelEl.textContent = getLevel();
-    }
+    updateElementTextContent("level", getLevel());
     // Full lines above 10 count to next level countdown
     setCompletedRows(fullLinesCount % 10);
   }
 }
 
-function updateScore(scoreEl) {
+function updateScore() {
   // Update the displayed score
-  updateScoreEl(scoreEl, getScoreValue());
-  // if (scoreEl) {
-  //   scoreEl.textContent = getScoreValue();
-  // }
+  updateElementTextContent("score", getScoreValue());
   updateLevel(getCompletedRows());
   // Update game interval delay based on the level
   // Higher level = lower game interval delay
@@ -170,21 +156,10 @@ function updateHighscore() {
     const previousHighscore = localStorage.getItem("tetris-highscore");
     if (finalScore > previousHighscore) {
       localStorage.setItem("tetris-highscore", finalScore);
-      if (highscoreEl) {
-        highscoreEl.textContent = finalScore;
-      }
+      updateElementTextContent("highscore", finalScore);
     }
   } else {
     localStorage.setItem("tetris-highscore", finalScore);
-  }
-}
-
-function getHighscore(element) {
-  // Check for highscore on local storage and renders it
-  if (localStorage.getItem("tetris-highscore")) {
-    const previousHighscore = localStorage.getItem("tetris-highscore");
-
-    element.textContent = previousHighscore;
   }
 }
 
@@ -210,50 +185,72 @@ function updateGame(
   );
 }
 
-// TODO Continue test coverage
-function startGame(messageContainerEl, highscoreEl, scoreEl, levelEl) {
+function startGame(
+  moveDownFunction,
+  checkCollisionFunction,
+  getPieceFunction,
+  messageContainerEl,
+  startButton,
+  backgroundMusic
+) {
   // Hide the message container
   if (messageContainerEl && !messageContainerEl.classList.contains("hidden")) {
     messageContainerEl.classList.add("hidden");
   }
   // Start the background music fromthe beginning
-  if (backgroundMusic) {
-    backgroundMusic.currentTime = 0;
-    backgroundMusic.play();
-  }
+  backgroundMusic.currentTime = 0;
+  backgroundMusic.play();
   // Initialize game variables and start the game loop
   setIsGameOver(false);
   setScoreValue(0);
-  updateScoreEl(scoreEl, "0");
-  getHighscore(highscoreEl);
+  updateElementTextContent("score", "0");
+  updateHighscoreEl();
   setLevel(1);
-  updateLevelEl(levelEl);
+  updateElementTextContent("level", getLevel());
   setGameSpeed(initialGameSpeed);
   resetGrid();
   clearAllPieces();
   createNextPiece();
   createFirstPiece();
-  updateGame(moveDown, checkCollision, getPiece, clearPiece, gameOver);
+  updateGame(
+    moveDownFunction,
+    checkCollisionFunction,
+    getPieceFunction,
+    getPiece,
+    clearPiece,
+    gameOver
+  );
   // Disable the start button so that the user doesn't click ingame
-  if (startButton) {
-    startButton.setAttribute("disabled", "true");
-  }
+  startButton.setAttribute("disabled", "true");
 }
+
+// TODO Continue test coverage
 
 // Event Listeners
 if (startButton) {
   startButton.addEventListener("click", () => {
-    startGame(messageContainer, highscoreEl, scoreEl);
+    startGame(
+      moveDown,
+      checkCollision,
+      getPiece,
+      messageContainer,
+      startButton,
+      backgroundMusic
+    );
   });
 }
 if (retryButton) {
   retryButton.addEventListener("click", () => {
-    startGame(messageContainer, highscoreEl, scoreEl);
+    startGame(
+      moveDown,
+      checkCollision,
+      getPiece,
+      messageContainer,
+      startButton,
+      backgroundMusic
+    );
   });
 }
-
-// On load
-getHighscore(highscoreEl);
 
 export {
   updateCompletedRows,
@@ -266,11 +263,10 @@ export {
   getScoreValue,
   setScoreValue,
   updateScore,
-  updateHighscore,
-  getHighscore,
   setGameSpeed,
   getGameSpeed,
   gameOver,
+  updateHighscore,
   getIsGameOver,
   updateGame,
   startGame,

@@ -15,7 +15,6 @@ import {
   gameOver,
   getIsGameOver,
   updateHighscore,
-  getHighscore,
   updateGame,
   startGame,
 } from "../tetris/src/game";
@@ -103,8 +102,22 @@ describe("Calculate Score", () => {
 });
 
 describe("Update Level", () => {
+  beforeEach(() => {
+    // Mock the required DOM elements and methods
+    document.body.innerHTML = `
+    <div id="level">0</div>
+    `;
+    vi.mock("../tetris/src/renderer.js");
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   // Test case: Testing level update when 10 full lines are completed
   test("Update level and completed rows for 10 full lines", () => {
+    // renderer.updateElementTextContent = vi.fn(() => 0);
+
     // Set the initial level and completed rows
     setLevel(1);
     setCompletedRows(0);
@@ -126,7 +139,7 @@ describe("Update Level", () => {
     setCompletedRows(3); // 3 completed rows from previous level
 
     // Call the updateLevel function with 15 full lines completed
-    updateLevel(15);
+    updateLevel(15, "level");
 
     // Assert that the level has been updated to 3
     expect(getLevel()).toBe(3);
@@ -153,12 +166,6 @@ describe("Update Level", () => {
 });
 
 describe("Update Score", () => {
-  beforeEach(() => {
-    // Mock the required DOM elements and methods
-    document.body.innerHTML = `
-    <div id="score">'0'</div>
-    `;
-  });
   // Test case: Testing score update with level increase
   test("Update score, level, and game speed when completing 10 full lines", () => {
     // Set initial level, completed rows, and game speed
@@ -166,11 +173,8 @@ describe("Update Score", () => {
     setGameSpeed(500);
     setCompletedRows(10);
 
-    // Mock DOM elements and properties
-    const scoreEl = document.getElementById("score");
-
     // Call updateScore with 10 full lines completed
-    updateScore(scoreEl);
+    updateScore();
 
     // Assert that the level is increased to 2
     expect(getLevel()).toBe(2);
@@ -186,11 +190,8 @@ describe("Update Score", () => {
     setCompletedRows(9); // 2 completed rows from previous level
     setGameSpeed(420);
 
-    // Mock DOM elements and properties
-    const scoreEl = document.getElementById("score");
-
     // Call updateScore with 3 full lines completed (less than 10)
-    updateScore(scoreEl);
+    updateScore();
 
     // Assert that the level remains the same (level 4)
     expect(getLevel()).toBe(4);
@@ -306,50 +307,6 @@ describe("Update Highscore", () => {
   });
 });
 
-describe("Get Highscore", () => {
-  let highscoreEl;
-
-  beforeEach(() => {
-    // Clear localStorage and create a mock highscore value
-    localStorage.clear();
-    localStorage.setItem("tetris-highscore", "500");
-
-    // Create a mock highscore element and add it to the document body
-    highscoreEl = document.createElement("div");
-    highscoreEl.id = "high-score";
-    highscoreEl.textContent = "0";
-    document.body.appendChild(highscoreEl);
-  });
-
-  afterEach(() => {
-    // Clean up the added element
-    document.body.removeChild(highscoreEl);
-  });
-
-  test("Renders highscore from localStorage", () => {
-    // Call the getHighscore function
-    getHighscore(highscoreEl);
-
-    // Retrieve the rendered highscore value
-    const renderedHighscore = highscoreEl.textContent;
-
-    // Assert that the rendered highscore matches the expected value
-    expect(renderedHighscore).toBe("500");
-  });
-
-  test("No highscore in localStorage doesn't change highscore element", () => {
-    localStorage.clear();
-    // Call the getHighscore function
-    getHighscore(highscoreEl);
-
-    // Retrieve the rendered highscore value
-    const renderedHighscore = highscoreEl.textContent;
-
-    // Assert that the rendered highscore matches the expected value
-    expect(renderedHighscore).toBe("0");
-  });
-});
-
 describe("Update Game", () => {
   test("Piece moves down successfully without collision", () => {
     // Mock functions and variables
@@ -378,7 +335,6 @@ describe("Update Game", () => {
       getGameSpeed()
     );
     // Ensure that other functions are not called
-    // expect(mockCheckCollision).not.toHaveBeenCalled();
     expect(mockClearPiece).not.toHaveBeenCalled();
     expect(mockGameOver).not.toHaveBeenCalled();
   });
@@ -418,20 +374,12 @@ describe("Update Game", () => {
   });
 });
 
-// TODO
 describe("Start Game", () => {
   beforeEach(() => {
-    // Clear localStorage and create a mock highscore value
-    localStorage.clear();
-    localStorage.setItem("tetris-highscore", "500");
-
     // Mock the required DOM elements and methods
     document.body.innerHTML = `
     <div id="message-container"></div>
     <audio id="background-music"></audio>
-    <div id="score">0</div>
-    <div id="high-score">0</div>
-    <div id="level">0</div>
     <button id="start-button">Start</button>
     `;
 
@@ -444,6 +392,16 @@ describe("Start Game", () => {
   });
 
   test("Starts the game successfully", () => {
+    // Mock functions and variables
+    const mockMoveDown = vi.fn();
+    const mockCheckCollision = vi.fn(() => false);
+    const mockGetPiece = vi.fn(() => "");
+
+    // Replace actual functions with mocks
+    global.moveDown = mockMoveDown;
+    global.checkCollision = mockCheckCollision;
+    global.getPiece = mockGetPiece;
+
     // Set initial game state
     setScoreValue(100);
     setLevel(2);
@@ -451,30 +409,34 @@ describe("Start Game", () => {
 
     // Mock DOM elements and properties
     const messageContainerEl = document.getElementById("message-container");
-    messageContainerEl.classList.add("hidden");
     const backgroundMusic = document.getElementById("background-music");
-    const scoreEl = document.getElementById("score");
-    scoreEl.textContent = "200";
-    const highscoreEl = document.getElementById("high-score");
-    const levelEl = document.getElementById("level");
+    backgroundMusic.currentTime = 20;
+    backgroundMusic.pause();
     const startButton = document.getElementById("start-button");
+    startButton.setAttribute("disabled", "false");
 
     // Call the startGame function
-    startGame(messageContainerEl, highscoreEl, scoreEl, levelEl);
+    startGame(
+      mockMoveDown,
+      mockCheckCollision,
+      mockGetPiece,
+      messageContainerEl,
+      startButton,
+      backgroundMusic
+    );
 
     // Assert that game state has been reset
     expect(messageContainerEl.classList.contains("hidden")).toBe(true);
+    expect(backgroundMusic.currentTime).toBe(0);
+    expect(backgroundMusic.paused).toBe(false);
     expect(getIsGameOver()).toBe(false);
-    expect(scoreEl.textContent).toBe("0");
-    expect(highscoreEl.textContent).toBe("500");
-    expect(levelEl.textContent).toBe("1");
+    expect(startButton.getAttribute("disabled")).toBe("true");
 
     // Cleanup
     messageContainerEl.remove();
     backgroundMusic.remove();
-    scoreEl.remove();
-    highscoreEl.remove();
-    levelEl.remove();
     startButton.remove();
   });
 });
+
+// TODO

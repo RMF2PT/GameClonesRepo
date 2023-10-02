@@ -9,11 +9,30 @@ import {
   getNextPiece,
 } from "./gameElements.js";
 
+const elementsArr = [];
+const scoreEl = document.getElementById("score");
+const highscoreEl = document.getElementById("highscore");
+const levelEl = document.getElementById("level");
+elementsArr.push(scoreEl, highscoreEl, levelEl);
 const gameContainer = document.getElementById("game-container");
 const nextPieceContainer = document.getElementById("next-piece-container");
 const BLOCK_SIZE = 30;
 
-// TODO create setter and getter for piece, grid and nextpiece - it might be better to move game elements to new file
+function updateElementTextContent(elementName, value) {
+  elementsArr.forEach((element) => {
+    if (element.id === elementName) {
+      element.textContent = value;
+    }
+  });
+}
+
+function updateHighscoreEl() {
+  // Check for highscore on local storage and renders it
+  if (localStorage.getItem("tetris-highscore")) {
+    const previousHighscore = localStorage.getItem("tetris-highscore");
+    updateElementTextContent("highscore", previousHighscore);
+  }
+}
 
 function createFirstPiece() {
   setPiece(createPiece());
@@ -159,7 +178,7 @@ function placePieceInGrid() {
   // After placing the piece in the grid, check and clear completed lines
   clearFullLines();
   // Update the score
-  updateScore();
+  updateScore(scoreEl, levelEl);
   // Draw landed blocks after checking full lines
   drawLandedBlocks();
   // Draw the next piece
@@ -216,7 +235,12 @@ function clearFullLines() {
   calculateScore(fullLines);
 }
 
+// On load
+updateHighscoreEl();
+
 export {
+  updateElementTextContent,
+  updateHighscoreEl,
   createFirstPiece,
   createNextPiece,
   reassignPiece,
