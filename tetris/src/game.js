@@ -38,12 +38,20 @@ function setScoreValue(newScore) {
   scoreValue = newScore;
 }
 
+function updateScoreEl(scoreEl, newScore) {
+  scoreEl.textContent = newScore;
+}
+
 function getLevel() {
   return level;
 }
 
 function setLevel(newLevel) {
   level = newLevel;
+}
+
+function updateLevelEl(levelEl) {
+  levelEl.textContent = getLevel();
 }
 
 function getCompletedRows() {
@@ -121,11 +129,12 @@ function updateLevel(fullLinesCount) {
   }
 }
 
-function updateScore() {
+function updateScore(scoreEl) {
   // Update the displayed score
-  if (scoreEl) {
-    scoreEl.textContent = getScoreValue();
-  }
+  updateScoreEl(scoreEl, getScoreValue());
+  // if (scoreEl) {
+  //   scoreEl.textContent = getScoreValue();
+  // }
   updateLevel(getCompletedRows());
   // Update game interval delay based on the level
   // Higher level = lower game interval delay
@@ -202,10 +211,10 @@ function updateGame(
 }
 
 // TODO Continue test coverage
-function startGame() {
+function startGame(messageContainerEl, highscoreEl, scoreEl, levelEl) {
   // Hide the message container
-  if (messageContainer && !messageContainer.classList.contains("hidden")) {
-    messageContainer.classList.add("hidden");
+  if (messageContainerEl && !messageContainerEl.classList.contains("hidden")) {
+    messageContainerEl.classList.add("hidden");
   }
   // Start the background music fromthe beginning
   if (backgroundMusic) {
@@ -215,11 +224,10 @@ function startGame() {
   // Initialize game variables and start the game loop
   setIsGameOver(false);
   setScoreValue(0);
-  if (scoreEl) {
-    scoreEl.textContent = 0;
-  }
+  updateScoreEl(scoreEl, "0");
   getHighscore(highscoreEl);
   setLevel(1);
+  updateLevelEl(levelEl);
   setGameSpeed(initialGameSpeed);
   resetGrid();
   clearAllPieces();
@@ -234,10 +242,14 @@ function startGame() {
 
 // Event Listeners
 if (startButton) {
-  startButton.addEventListener("click", startGame);
+  startButton.addEventListener("click", () => {
+    startGame(messageContainer, highscoreEl, scoreEl);
+  });
 }
 if (retryButton) {
-  retryButton.addEventListener("click", startGame);
+  retryButton.addEventListener("click", () => {
+    startGame(messageContainer, highscoreEl, scoreEl);
+  });
 }
 
 // On load
@@ -261,4 +273,5 @@ export {
   gameOver,
   getIsGameOver,
   updateGame,
+  startGame,
 };

@@ -13,6 +13,31 @@ function setGrid(newGrid) {
 function resetGrid() {
   grid = Array.from({ length: ROWS }, () => Array(COLUMNS).fill(null));
 }
+/*
+class Grid {
+  constructor() {
+    this.grid = [];
+    this.reset();
+  }
+
+  get() {
+    return this.grid;
+  }
+
+  set(newGrid) {
+    this.grid = newGrid;
+  }
+
+  reset() {
+    this.grid = Array.from({ length: ROWS }, () => Array(COLUMNS).fill(null));
+  }
+}
+
+// Usage
+const gameGrid = new Grid();
+const currentGridState = gameGrid.get();
+gameGrid.reset();
+*/
 
 let piece;
 
