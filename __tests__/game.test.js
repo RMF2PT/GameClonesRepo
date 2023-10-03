@@ -1,4 +1,6 @@
-import { afterEach, beforeEach, expect } from "vitest";
+import { afterEach, beforeEach, describe, expect } from "vitest";
+import { screen, fireEvent, getByTestId } from "@testing-library/dom"; // Import the testing-library's screen and fireEvent functions
+
 import {
   updateCompletedRows,
   getCompletedRows,
@@ -258,7 +260,7 @@ describe("Update Highscore", () => {
     localStorage.setItem("tetris-highscore", "300");
 
     // Set the score
-    setScoreValue(400);
+    setScoreValue("400");
 
     // Call the updateHighscore function
     updateHighscore();
@@ -439,4 +441,4 @@ describe("Start Game", () => {
   });
 });
 
-// TODO
+// TODO continue unit tests

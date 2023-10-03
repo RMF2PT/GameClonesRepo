@@ -12,5 +12,6 @@ export default defineConfig({
     coverage: {
       reporter: ["html"],
     },
+    setupFiles: ["./__tests__/vitest-setup.js"],
   },
 });
